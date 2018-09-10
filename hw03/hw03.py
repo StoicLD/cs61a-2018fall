@@ -35,7 +35,12 @@ def has_seven(k):
     True
     """
     "*** YOUR CODE HERE ***"
-
+    if(k%10==7):
+        return True
+    elif(k//10==0):
+        return False
+    else:
+        return has_seven(k//10)
 def pingpong(n):
     """Return the nth element of the ping-pong sequence.
 
@@ -68,6 +73,29 @@ def pingpong(n):
     True
     """
     "*** YOUR CODE HERE ***"
+    """
+    This is the while version of ping-pong
+    plus=1
+    i=1
+    cur=0
+    while(i<=n):
+        cur+=plus
+        if(i%10==7 or has_seven(i)):
+            plus=-plus        
+        i+=1
+    return cur
+    """
+    #内部定义了一个函数以后，就可以反转，从1开始到n开始递归，而不是从n到1的递归
+    def helper(k,direction,current_value):
+        if(k==n):
+            return current_value
+        elif(k%7==0 or has_seven(k)):
+            return helper(k+1, -direction, -direction+current_value)
+        else:
+            return helper(k+1, direction, direction+current_value)
+    return helper(1,1,1)
+
+
 
 def accumulate(combiner, base, n, term):
     """Return the result of combining the first n terms in a sequence and base.
@@ -115,6 +143,12 @@ def filtered_accumulate(combiner, base, pred, n, term):
     """
     def combine_if(x, y):
         "*** YOUR CODE HERE ***"
+        #这里的思路就是pred(y),y就是每次的term(n)，如果是true直接返回正常的
+        #的情况combiner(x,y)，否则返回x,x就是total，相当于没有combine
+        if(pred(y)):
+            return combiner(x,y)
+        else:
+            return x
     return accumulate(combine_if, base, n, term)
 
 def odd(x):
