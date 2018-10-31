@@ -1,0 +1,31 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	0	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+reverse	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (reverse lst)$/;"	function	line:1
+longest-increasing-subsequence	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (longest-increasing-subsequence lst)$/;"	function	line:11
+cadr	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (cadr s) (car (cdr s)))$/;"	function	line:25
+caddr	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (caddr s) (cadr (cdr s)))$/;"	function	line:26
+derive	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (derive expr var)$/;"	function	line:30
+variable?	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (variable? x) (symbol? x))$/;"	function	line:39
+same-variable?	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (same-variable? v1 v2)$/;"	function	line:40
+=number?	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (=number? expr num)$/;"	function	line:44
+make-sum	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (make-sum a1 a2)$/;"	function	line:48
+sum?	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (sum? x)$/;"	function	line:53
+addend	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (addend s) (cadr s))$/;"	function	line:55
+augend	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (augend s) (caddr s))$/;"	function	line:56
+make-product	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (make-product m1 m2)$/;"	function	line:59
+product?	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (product? x)$/;"	function	line:65
+multiplier	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (multiplier p) (cadr p))$/;"	function	line:67
+multiplicand	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (multiplicand p) (caddr p))$/;"	function	line:68
+derive-sum	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (derive-sum expr var)$/;"	function	line:70
+derive-product	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (derive-product expr var)$/;"	function	line:74
+make-exp	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (make-exp base exponent)$/;"	function	line:79
+base	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (base exp)$/;"	function	line:83
+exponent	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (exponent exp)$/;"	function	line:87
+exp?	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (exp? exp)$/;"	function	line:91
+x^2	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define x^2 (make-exp 'x 2))$/;"	function	line:95
+x^3	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define x^3 (make-exp 'x 3))$/;"	function	line:96
+derive-exp	/Users/Ld19980608/Documents/UCB/CS61A/homework/hw08/hw08.scm	/^(define (derive-exp exp var)$/;"	function	line:98
