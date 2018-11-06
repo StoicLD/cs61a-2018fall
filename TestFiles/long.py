@@ -1,6 +1,4 @@
-
 def long(lst):
-    #从当前位置开始找递增序列
     def helper(lst):
         if(lst == None):
             return None
@@ -12,7 +10,7 @@ def long(lst):
             for i in range(len(lst)):
                 if(y <= i):
                     t.append(i)
-                    y = i       
+                    y=i
             return t
     s = helper(lst)
     z =[]

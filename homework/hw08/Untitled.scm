@@ -11,3 +11,19 @@
     ))
   (reverse (lis-reversed lst nil))
 )
+
+(define-macro (two-m pro)
+    (list 'begin pro pro))
+
+(define (two pro)
+  (list `begin pro pro))
+
+(define (map fn vals )
+  (if (null? vals) vals
+      (cons (fn (car vals))
+            (map fn (cdr vals)))))
+
+(define-macro (for sym vals expr)
+  (list 'map (list `lambda (list `x) expr) vals))
+
+(for x `(2 3 4 5) (* x x))
