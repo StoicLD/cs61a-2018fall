@@ -16,7 +16,7 @@
 
 ### 一，那么我们来看第一个例子，
 - 首先 `(two (print 2))` 会拓展为 `(begin p p))` 其中 `p` 是 `(print 2)` 
-- 接着macro会进行一步 **evaluate！** 导致`begin` 被计算，但是注意这个时候p依旧还是一个 `list` 代表 `(print 2)` ，也就是 `(print 2)` 自身没有被求值，但是 `p` 这个符号被求值了，结果是一个`list` 代表 `(print 2)`
+- 接着macro会进行一步 **evaluate！** 导致`begin` 被计算，但是注意这个时候p依旧还是一个 `list` 代表 `(print 2)` ，也就是 `(print 2)` 自身没有被求值，但是 `p` 这个符号被求值了，结果是一个 `list` 代表 `(print 2)`
 - 随后macro展开结束，返回值为 `(print 2)` 这个list（后一个list）。
 - 就如同 `(begin (list 'print 2) 2)` 这个式子中的`(list 'print 2)` 一样，`begin` 计算了它结果是个是个list，并没有计算 `(print 2)` 本身。
 - 最后对macro返回的expression求值，即对 `(print 2)` 求值，得到2。
