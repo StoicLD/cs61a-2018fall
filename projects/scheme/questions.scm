@@ -49,6 +49,10 @@
 
 ;; Problem 19
 ;; Returns a function that checks if an expression is the special form FORM
+
+; 这题有多个值得反思的地方
+; (1) 首先这是一个递归的函数，我一开始竟然没有应用到这一带你
+
 (define (check-special form)
   (lambda (expr) (equal? form (car expr))))
 
@@ -75,7 +79,7 @@
                (params (cadr expr))
                (body   (cddr expr)))
            ; BEGIN PROBLEM 19
-           (list form params (map (lambda (x) (let-to-lambda x)) body))
+           (append (list form params) (map let-to-lambda body))
            ; END PROBLEM 19
            ))
         ((let? expr)
@@ -83,11 +87,16 @@
                (body   (cddr expr)))
            ; BEGIN PROBLEM 19
            (cons 
-             (list 'lambda (car (zip values)) (car body)) (cadr (zip values)))
+             (append (list 'lambda (car (zip values))) 
+                  (map let-to-lambda body)) 
+             (map let-to-lambda (cadr (zip values))))
            ; END PROBLEM 19
            ))
         (else
          ; BEGIN PROBLEM 19
-         expr
+         (map let-to-lambda expr))
          ; END PROBLEM 19
-         )))
+         ))
+
+; (cons 
+;     (list 'lambda (car (zip values)) (car body)) (cadr (zip values)))
