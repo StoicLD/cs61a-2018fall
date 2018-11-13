@@ -37,6 +37,10 @@ def scheme_eval(expr, env, _=None): # Optional third argument is ignored
         #expr是Pair的形式
         scheme_operator = scheme_eval(first, env)
         check_procedure(scheme_operator)
+        #如果是macro，不计算直接apply
+        if(isinstance(scheme_operator, MacroProcedure)):
+            return scheme_eval(scheme_operator.apply_macro(rest, env), env)
+
         #关于我的疑惑，(+ 1 (+ 2 3) 4)这个形式出去operator'+'只有三个元素其中(+ 2 3)是单独的一个
         #Pair,所以不会出现我想的rest重叠的情况
         #rest = Pair(1, Pair(Pair('+', Pair(2, Pair(3, nil))), Pair(4, nil)))
@@ -277,6 +281,7 @@ def do_define_form(expressions, env):
     """Evaluate a define form."""
     check_form(expressions, 2)
     target = expressions.first
+    #(define x 3) 这种单一强开
     if scheme_symbolp(target):
         check_form(expressions, 2, 2)
         # BEGIN PROBLEM 6
@@ -294,6 +299,7 @@ def do_define_form(expressions, env):
         env.define(target, scheme_eval(expressions.second.first, env))
         return target
         # END PROBLEM 6
+    #(define (f x y) (+ x y)) 这种要转换为lambda函数的情况
     elif isinstance(target, Pair) and scheme_symbolp(target.first):
         # BEGIN PROBLEM 10
         "*** YOUR CODE HERE ***"
@@ -470,6 +476,19 @@ def do_define_macro(expressions, env):
     """Evaluate a define-macro form."""
     # BEGIN Problem 21
     "*** YOUR CODE HERE ***"
+    check_form(expressions, 2, 2)
+    target = expressions.first
+    check_form(target, 1)
+
+    macro_symbol = target.first
+    if(not scheme_symbolp(macro_symbol)):
+        raise SchemeError('{0} need to be a symbol!'.format(macro_symbol))
+    formals = target.second
+    check_formals(formals)
+    body = expressions.second
+    env.define(macro_symbol, MacroProcedure(formals, body, env))
+
+    return macro_symbol
     # END Problem 21
 
 
