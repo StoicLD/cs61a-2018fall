@@ -59,6 +59,7 @@ def scheme_apply(procedure, args, env):
     if isinstance(procedure, BuiltinProcedure):
         return procedure.apply(args, env)
     else:
+    #不是builtin的需要继续eval全部的
         new_env = procedure.make_call_frame(args, env)
         return eval_all(procedure.body, new_env)
 
@@ -88,7 +89,9 @@ def eval_all(expressions, env):
         current_value = scheme_eval(expressions.first, env)
         expressions = expressions.second
 
-    return scheme_eval(expressions.first, env)
+    #最后一个应该是处于tail context里面的,这里顺带着处理了lambda的body最后一个
+    #式子，就是tail context
+    return scheme_eval(expressions.first, env, True)
     # END PROBLEM 8
 
 ################
@@ -337,13 +340,16 @@ def do_lambda_form(expressions, env):
     return LambdaProcedure(formals, body, env)
     # END PROBLEM 9
 
+#实验一，if的除了判定语句外的sub句子都是tail context
 def do_if_form(expressions, env):
     """Evaluate an if form."""
     check_form(expressions, 2, 3)
     if scheme_truep(scheme_eval(expressions.first, env)):
-        return scheme_eval(expressions.second.first, env)
+        #这里我加入了True
+        return scheme_eval(expressions.second.first, env, True)
     elif len(expressions) == 3:
-        return scheme_eval(expressions.second.second.first, env)
+        # 这里我加入了True
+        return scheme_eval(expressions.second.second.first, env, True)
 
 def do_and_form(expressions, env):
     """Evaluate a (short-circuited) and form."""
@@ -664,12 +670,20 @@ def optimize_tail_calls(original_scheme_eval):
         """Evaluate Scheme expression EXPR in environment ENV. If TAIL,
         return a Thunk containing an expression for further evaluation.
         """
+        #Thunk包含了当前的环境，因此不需要再次打开一个新的frame
+        #这里是
         if tail and not scheme_symbolp(expr) and not self_evaluating(expr):
+            #return eval_all(expr, env)
             return Thunk(expr, env)
 
         result = Thunk(expr, env)
         # BEGIN
         "*** YOUR CODE HERE ***"
+        while(isinstance(result, Thunk)):
+            #expr, env = result.expr, result.env
+            result = original_scheme_eval(result.expr, result.env)
+            #tail = True
+        return result
         # END
     return optimized_eval
 
@@ -681,7 +695,7 @@ def optimize_tail_calls(original_scheme_eval):
 ################################################################
 # Uncomment the following line to apply tail call optimization #
 ################################################################
-# scheme_eval = optimize_tail_calls(scheme_eval)
+scheme_eval = optimize_tail_calls(scheme_eval)
 
 
 

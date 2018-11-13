@@ -52,6 +52,9 @@
 
 ; 这题有多个值得反思的地方
 ; (1) 首先这是一个递归的函数，我一开始竟然没有应用到这一带你
+; (2) 其次在使用map的时候,(map (lambda (x) (let-to-lambda x) body)
+; 和直接(map let-to-lambda x body) 其实是一样的，因为let-to-lambda在被我们的
+; 解释器解析的时候其实就是直接展开成为lambda函数，如同我们的第一种定义
 
 (define (check-special form)
   (lambda (expr) (equal? form (car expr))))
@@ -79,7 +82,7 @@
                (params (cadr expr))
                (body   (cddr expr)))
            ; BEGIN PROBLEM 19
-           (append (list form params) (map let-to-lambda body))
+           (append (list form params) (map (lambda (x) (let-to-lambda x)) body))
            ; END PROBLEM 19
            ))
         ((let? expr)
