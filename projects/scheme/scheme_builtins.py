@@ -34,6 +34,9 @@ def check_type(val, predicate, k, name):
     """Returns VAL.  Raises a SchemeError if not PREDICATE(VAL)
     using "argument K of NAME" to describe the offending value."""
     if not predicate(val):
+        #print
+        # print(val)
+        # print(predicate)
         msg = "argument {0} of {1} has wrong type ({2})"
         raise SchemeError(msg.format(k, name, type(val).__name__))
     return val

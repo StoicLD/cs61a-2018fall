@@ -10,6 +10,21 @@
 ;;; *** Add your own tests here! ***
 ;;; ********************************
 ; BEGIN PROBLEM 0
+;;; TEST for Q19
+(define (zip pairs)
+  ; (print pairs)
+  (cond
+    ((null? pairs) (list nil nil))
+    ((null? (car pairs)) nil)
+    (else (cons (map car pairs) 
+                (zip (map cdr pairs)))
+    )
+  )
+)
+(zip (list '(a b) '(1 2)))
+; expect ((a 1) (b 2))
+
+
 
 ;;; TEST for Q6
 (define x (+ 1 2))
@@ -20,6 +35,22 @@ x
 ;;; TEST for Q7
 (quote high)
 ; expect high
+
+
+;;; TEST for Q8
+(begin (print 2) (print 2))
+; expect 2;2
+
+;;; TEST for Q10
+(define (f nil) (+ 1 1))
+; expect Error
+
+;;; TEST for Q12
+(define (out x y)
+  (define (in z x) (+ x (* z 3) (* y 2)))
+  (in x 10))
+(out 1 2)
+; expect 17
 
 ; END PROBLEM 0
 

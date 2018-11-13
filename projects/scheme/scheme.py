@@ -37,21 +37,16 @@ def scheme_eval(expr, env, _=None): # Optional third argument is ignored
         #expr是Pair的形式
         scheme_operator = scheme_eval(first, env)
         check_procedure(scheme_operator)
-        # args = []
-        # while(rest and rest != nil ):
-        #     print(rest)
-        #     args.append(scheme_eval(rest.first, env))
-        #     rest = rest.second
-        # print(args)
-
         #关于我的疑惑，(+ 1 (+ 2 3) 4)这个形式出去operator'+'只有三个元素其中(+ 2 3)是单独的一个
         #Pair,所以不会出现我想的rest重叠的情况
         #rest = Pair(1, Pair(Pair('+', Pair(2, Pair(3, nil))), Pair(4, nil)))
         eval_lambda = lambda x: scheme_eval(x, env)
+
         rest = rest.map(eval_lambda)
-        #return scheme_operator.apply(rest, env)
+
         return scheme_apply(scheme_operator, rest, env)
         # END PROBLEM 5
+
 
 def self_evaluating(expr):
     """Return whether EXPR evaluates to itself."""
@@ -71,6 +66,28 @@ def eval_all(expressions, env):
     """Evaluate each expression im the Scheme list EXPRESSIONS in
     environment ENV and return the value of the last."""
     # BEGIN PROBLEM 8
+
+    #这里我又给自己挖了一个坑。。。应该要返回的是scheme中代表的空值nil
+    #但是eval_all(nil, env) # return None (meaning undefined)要返回None
+    #而不是nil
+
+    #因此当第一个是nil的时候直接返回None，而如果是一个Pair(nil, nil)这样的形式
+    #还是会返回nil的
+    if(expressions == nil):
+        return None
+    current_value = nil
+    # while(expressions != nil and expressions.first != nil):
+    #     #print(expressions.second)
+    #     #我的担忧是对此一举，在Q5中每个sub-expression都是Pair中的第一个元素而且是一个Pair类型
+    #     current_value = scheme_eval(expressions.first, env)
+    #     expressions = expressions.second
+    #当second时nil的时候，标志着结束，但是还是要计算第一个
+    while(expressions.second != nil):
+        #print(expressions.second)
+        #我的担忧是对此一举，在Q5中每个sub-expression都是Pair中的第一个元素而且是一个Pair类型
+        current_value = scheme_eval(expressions.first, env)
+        expressions = expressions.second
+
     return scheme_eval(expressions.first, env)
     # END PROBLEM 8
 
@@ -107,6 +124,8 @@ class Frame:
         current_frame = self
         while(current_frame):
             obj_value = current_frame.bindings.get(symbol)
+            #找不到对应的值返回的就是None，没有问题
+            #但是
             if(obj_value != None):
                 return obj_value
             current_frame = current_frame.parent        
@@ -127,6 +146,19 @@ class Frame:
         """
         # BEGIN PROBLEM 11
         "*** YOUR CODE HERE ***"
+        if(len(formals) != len(vals)):
+            raise SchemeError('the number of parameters are not the same as values!')
+        check_formals(formals)
+        #check_formals(vals)
+        child_frame = Frame(self)
+
+        while(formals != nil and vals != nil):
+            para = formals.first
+            val = vals.first
+            child_frame.bindings[para] = val
+            formals = formals.second
+            vals = vals.second
+        return child_frame
         # END PROBLEM 11
 
 ##############
@@ -169,12 +201,18 @@ class BuiltinProcedure(Procedure):
             args = args.second
         # BEGIN PROBLEM 4
         "*** YOUR CODE HERE ***"
-        if(self.use_env == True):
+        if self.use_env:
             python_args.append(env)
         try:
+            # extra print
+            # print("自身的函数是:",self.fn)
+            # print("自身的参数是",python_args)
+
             result = self.fn(*python_args)
+
+            # print("result 是：",result)
             return result
-        except Exception as e:
+        except TypeError as e:
             raise SchemeError('argument error!: {0}'.format(args))
         # END PROBLEM 4
 
@@ -194,6 +232,10 @@ class LambdaProcedure(Procedure):
         of values, for a lexically-scoped call evaluated in environment ENV."""
         # BEGIN PROBLEM 12
         "*** YOUR CODE HERE ***"
+        #(define (out x y) (define (in x z) (+ x z y)) (in x y))
+        #这里需要注意，new_frame的parent是self.env而不是env
+        new_frame = self.env.make_child_frame(self.formals, args)
+        return new_frame
         # END PROBLEM 12
 
     def __str__(self):
@@ -252,6 +294,15 @@ def do_define_form(expressions, env):
     elif isinstance(target, Pair) and scheme_symbolp(target.first):
         # BEGIN PROBLEM 10
         "*** YOUR CODE HERE ***"
+        # 在这个式子中target就是(f x y) (define (f x y) (+ x y))
+        func_symbol = target.first
+        formals = target.second
+        body = expressions.second
+        #不知道check_formals 有没有判断是不是nil的情况，先用了再说
+        #更新，确实nil不是string类型，check的时候会报错没问题
+        check_formals(formals)
+        env.define(func_symbol, do_lambda_form(Pair(formals, body), env))
+        return func_symbol
         # END PROBLEM 10
     else:
         bad_target = target.first if isinstance(target, Pair) else target
@@ -281,6 +332,9 @@ def do_lambda_form(expressions, env):
     check_formals(formals)
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    body = expressions.second
+    check_form(body, 1)
+    return LambdaProcedure(formals, body, env)
     # END PROBLEM 9
 
 def do_if_form(expressions, env):
@@ -295,12 +349,38 @@ def do_and_form(expressions, env):
     """Evaluate a (short-circuited) and form."""
     # BEGIN PROBLEM 13
     "*** YOUR CODE HERE ***"
+    value = True
+    while(expressions != nil):
+        value = scheme_eval(expressions.first, env)
+        #python中0与False等价！！！
+        if(value == False and isinstance(value, bool)):
+            break
+        expressions = expressions.second
+    return value
     # END PROBLEM 13
 
 def do_or_form(expressions, env):
     """Evaluate a (short-circuited) or form."""
     # BEGIN PROBLEM 13
     "*** YOUR CODE HERE ***"
+    # value = False
+    # while(expressions != nil):
+    #     value = scheme_eval(expressions.first, env)
+    #     #python中0与False等价！！！
+    #     if(not isinstance(value, bool) or value == True):
+    #         break
+    #     expressions = expressions.second
+    # return value
+    if expressions is nil:
+        return False
+    elif expressions.second is nil:  # Tail context
+        return scheme_eval(expressions.first, env, True)
+    else:
+        first_expr = scheme_eval(expressions.first, env)
+        if scheme_falsep(first_expr):  # The first expression is False
+            return do_or_form(expressions.second, env)
+        else:  # The first expression is True
+            return first_expr
     # END PROBLEM 13
 
 def do_cond_form(expressions, env):
@@ -317,6 +397,17 @@ def do_cond_form(expressions, env):
         if scheme_truep(test):
             # BEGIN PROBLEM 14
             "*** YOUR CODE HERE ***"
+            #问题出在这里！！！！！
+            #之前(cond (True nil)) 这种情况下回返回True，而不是nil导致后面出错！！1
+
+            # result = eval_all(clause.second, env)
+            # if(not result):
+            #     return test
+            # return result
+            if clause.second is nil:  # When the true predicate does not have a corresponding result sub-expression, return the predicate value
+                return test
+            return eval_all(clause.second, env)
+
             # END PROBLEM 14
         expressions = expressions.second
 
@@ -335,6 +426,38 @@ def make_let_frame(bindings, env):
         raise SchemeError('bad bindings list in let form')
     # BEGIN PROBLEM 15
     "*** YOUR CODE HERE ***"
+    #Pair(Pair(x, Pair(3, nil)), Pair(Pair(y, Pair(4)), nil))
+    # it = bindings
+    # while(it != nil):
+    #     check_form(it.first, 2, 2)
+    #     it = it.second
+
+    # formals = bindings.map(lambda x: x.first)
+    # vals = bindings.map(lambda x: x.second)
+
+    # check_formals(formals)
+    # eval (x (+1 2)) 这些bindling中带有expression的
+    # eval_with_env = lambda x: scheme_eval(x, env)
+    # vals = vals.map(eval_with_env)
+    # child_frame = env.make_child_frame(formals, vals)
+    # return child_frame
+
+    #Pair(Pair(x, Pair(3, nil)), Pair(Pair(y, Pair(4)), nil))
+    formals = nil
+    vals = nil
+    #逆转序列
+    while (bindings !=nil):
+        key_value = bindings.first
+        check_form(key_value, 2, 2)
+        #逆转构造序列
+        formals = Pair(key_value.first, formals)
+        #需要求值，针对 (let ((x (+ 2 3)) (y (* 2 4))  (+ x y) )) 这样的情况
+        vals = Pair(scheme_eval(key_value.second.first, env), vals)
+        bindings = bindings.second
+
+    check_formals(formals)
+    return env.make_child_frame(formals, vals)
+
     # END PROBLEM 15
 
 def do_define_macro(expressions, env):
@@ -455,6 +578,12 @@ class MuProcedure(Procedure):
 
     # BEGIN PROBLEM 16
     "*** YOUR CODE HERE ***"
+    def make_call_frame(self, args, env):
+        #(define (out x y) (define (in x z) (+ x z y)) (in x y))
+        #这里需要注意，new_frame的parent是self.env而不是env
+        new_frame = env.make_child_frame(self.formals, args)
+        return new_frame
+
     # END PROBLEM 16
 
     def __str__(self):
@@ -471,6 +600,8 @@ def do_mu_form(expressions, env):
     check_formals(formals)
     # BEGIN PROBLEM 16
     "*** YOUR CODE HERE ***"
+    body = expressions.second
+    return MuProcedure(formals, body)
     # END PROBLEM 16
 
 SPECIAL_FORMS['mu'] = do_mu_form

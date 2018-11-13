@@ -73,6 +73,9 @@ class Pair:
         """Return a Scheme list after mapping Python function FN to SELF."""
         #传入的fn函数只接受一个参数
         mapped = fn(self.first)
+        # extra print
+        # print(mapped)
+
         if self.second is nil or isinstance(self.second, Pair):
             return Pair(mapped, self.second.map(fn))
         else:
