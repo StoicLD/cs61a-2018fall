@@ -71,21 +71,14 @@ def eval_all(expressions, env):
     """Evaluate each expression im the Scheme list EXPRESSIONS in
     environment ENV and return the value of the last."""
     # BEGIN PROBLEM 8
-
     #这里我又给自己挖了一个坑。。。应该要返回的是scheme中代表的空值nil
     #但是eval_all(nil, env) # return None (meaning undefined)要返回None
     #而不是nil
-
     #因此当第一个是nil的时候直接返回None，而如果是一个Pair(nil, nil)这样的形式
     #还是会返回nil的
     if(expressions == nil):
         return None
     current_value = nil
-    # while(expressions != nil and expressions.first != nil):
-    #     #print(expressions.second)
-    #     #我的担忧是对此一举，在Q5中每个sub-expression都是Pair中的第一个元素而且是一个Pair类型
-    #     current_value = scheme_eval(expressions.first, env)
-    #     expressions = expressions.second
     #当second时nil的时候，标志着结束，但是还是要计算第一个
     while(expressions.second != nil):
         #print(expressions.second)
@@ -361,14 +354,27 @@ def do_and_form(expressions, env):
     """Evaluate a (short-circuited) and form."""
     # BEGIN PROBLEM 13
     "*** YOUR CODE HERE ***"
-    value = True
-    while(expressions != nil):
-        value = scheme_eval(expressions.first, env)
-        #python中0与False等价！！！
-        if(value == False and isinstance(value, bool)):
-            break
-        expressions = expressions.second
-    return value
+    # value = True
+    # while(expressions != nil):
+    #     value = scheme_eval(expressions.first, env)
+    #     #python中0与False等价！！！
+    #     if(value == False and isinstance(value, bool)):
+    #         break
+    #     expressions = expressions.second
+    # return value
+    # (and) 直接返回True
+    if expressions == nil:
+        return True
+    #last one,最后一个需要加入tail = True
+    elif expressions.second is nil:
+        return scheme_eval(expressions.first,env, True)
+    else:
+        while expressions.second is not nil:
+            # if scheme_falsep(scheme_eval(expressions.first, env)):
+            if scheme_eval(expressions.first,env) is False:
+                return False
+            expressions = expressions.second
+        return scheme_eval(expressions.first,env, True)
     # END PROBLEM 13
 
 def do_or_form(expressions, env):
@@ -385,11 +391,11 @@ def do_or_form(expressions, env):
     # return value
     if expressions is nil:
         return False
-    elif expressions.second is nil:  # Tail context
+    elif expressions.second is nil:  # 尾递归的情形
         return scheme_eval(expressions.first, env, True)
     else:
         first_expr = scheme_eval(expressions.first, env)
-        if scheme_falsep(first_expr):  # The first expression is False
+        if first_expr is False:  # The first expression is False
             return do_or_form(expressions.second, env)
         else:  # The first expression is True
             return first_expr
@@ -411,7 +417,6 @@ def do_cond_form(expressions, env):
             "*** YOUR CODE HERE ***"
             #问题出在这里！！！！！
             #之前(cond (True nil)) 这种情况下回返回True，而不是nil导致后面出错！！1
-
             # result = eval_all(clause.second, env)
             # if(not result):
             #     return test
@@ -693,6 +698,10 @@ def optimize_tail_calls(original_scheme_eval):
         #这里是
         if tail and not scheme_symbolp(expr) and not self_evaluating(expr):
             #return eval_all(expr, env)
+            #相当于一层一层的深入下去，直到到达一个tail时，注意此时的env和expr都被更新了，那么这次返回
+            #将直接返回到最上层，也就是函数栈展开的其实位置，将这个包裹的Thunk返回，这样我们就得到了想要计算的环境
+            #以及对应的变量，此时在最外层，env还是 global的，但是result.env是我们返回的结果，对于(sum 1001 0)
+            #的第二层来说，result.env就变成了 n = 1000, total = 1001
             return Thunk(expr, env)
 
         result = Thunk(expr, env)

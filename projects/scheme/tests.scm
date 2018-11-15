@@ -41,6 +41,10 @@ x
 (begin (print 2) (print 2))
 ; expect 2;2
 
+;;; TEST for Q9
+(lambda (x y) (+ x 2) (+ y 3) (+ x y))
+; expect (lambda (x y) (+ x 2) (+ y 3) (+ x y))
+
 ;;; TEST for Q10
 (define (f nil) (+ 1 1))
 ; expect Error
@@ -51,6 +55,25 @@ x
   (in x 10))
 (out 1 2)
 ; expect 17
+
+;;; TEST for Q13
+(and (or False 3) False)
+; expect #f
+
+(define (f x y) (and x y))
+(or False (and (f 1 1) 10))
+; expect 10
+
+;;; TEST for Q14
+(cond ((and 3 False) 1) ((or False) 2) (else 3))
+; expect 3
+
+;;; TEST for Q15
+(let ((x (+ 2 3)) 
+      (y (begin (define (f x y) (+ x y)) (f 3 2))))
+      (+ x y) 
+)
+; expect 10
 
 ; END PROBLEM 0
 
@@ -101,7 +124,6 @@ x
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Move the following (exit) line down the file to run additional tests. ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(exit)
 
 
 ;;; 1.1.2
@@ -625,9 +647,22 @@ one-through-four
 ;;; Extra credit ;;;
 ;;;;;;;;;;;;;;;;;;;;
 
-(exit)
+; (exit)
 
 ; Tail call optimization tests
+
+; TEST for Q20
+;(define (sum n total)
+;  (and 1
+;    (sum (- n 1) (+ n total))))
+;(sum 1001 0)
+;; expect 501501
+
+;(define (sum n total)
+;  (or False
+;    (sum (- n 1) (+ n total))))
+;(sum 1001 0)
+;; expect 501501
 
 (define (sum n total)
   (if (zero? n) total
@@ -652,7 +687,7 @@ one-through-four
 (sum 1001 0)
 ; expect 501501
 
-(exit)
+; (exit)
 
 ; macro tests
 
@@ -687,3 +722,4 @@ one-through-four
 
 (hyp 3 4)
 ; expect 5.000023178253949
+(exit)
